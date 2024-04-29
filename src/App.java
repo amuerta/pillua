@@ -12,7 +12,8 @@ import module_gui.ExitWindow;
 import module_gui.AccountWindow;
 import module_gui.ContactWindow;
 import module_gui.DefaultBackground;
-
+import module_gui.PreviewWindow;
+import module_gui.ItemWindow;
 
 // # Todo
 //
@@ -132,7 +133,6 @@ public class App {
       .width(WIN_W - avrg_padding*2)
       .height(WIN_H-PANEL_HEIGHT-avrg_padding*2);
 
-
     Rectangle content_view_window_g = new Rectangle()
       .y(PANEL_HEIGHT + avrg_padding * 2)
       .x(avrg_padding + (float)(WIN_W * 0.1 * 0.5))
@@ -164,16 +164,48 @@ public class App {
       .height((float)(WIN_H / 1.5));
 
 
+    // Dynamic elements
+
+    Rectangle tooltip_big_g = new Rectangle()
+      .x(0)
+      .y(0)
+      .width(400)
+      .height(200);
+
+
     // CREATE ELEMENTS
+    
+    // panel
     NavPanel navpan     = new NavPanel(navpan_g,page_selected);
+    ItemWindow product = new ItemWindow(content_halfview_g);
+
+    // tooltips
+    // PreviewWindow item_tooltip = new PreviewWindow(tooltip_big_g);
 
     // List/Grid elements
     // (qsearch, categories, bookmarks, cart)
     
     GridView categories = new GridView(content_view_g,item_selected,"#180# Product search"); 
-    ListView search     = new ListView(content_view_window_g, "#42# Search all products", "Search product in DATABASE");
-    ListView bookmarks = new ListView(content_view_window_g, "#42# Search bookmarked", "Search product in BOOKMARKS");
-    ListView cart  = new ListView(content_view_window_g, "#42# Search in cart", "Search product in SHOPPING CART");
+    
+    ListView search     = new ListView(
+        content_view_window_g,
+        tooltip_big_g,
+        "#42# Search all products", 
+        "Search product in DATABASE"
+      );
+    ListView bookmarks = new ListView(
+        content_view_window_g,
+        tooltip_big_g,
+        "#42# Search bookmarked", 
+        "Search product in BOOKMARKS"
+      );
+    ListView cart  = new ListView(
+        content_view_window_g, 
+        tooltip_big_g,
+        "#42# Search in cart", 
+        "Search product in SHOPPING CART"
+      );
+
 
     ContactWindow contact = new ContactWindow(content_smallview_g);
 
@@ -232,6 +264,9 @@ public class App {
           if (!shouldclose_contact)
             shouldclose_contact = contact.run();
 
+          // TEMP
+          product.run();
+
           // USER
 
           if (!shouldclose_account)
@@ -247,6 +282,7 @@ public class App {
             shouldclose_exit = exit.run();
 
 
+          // item_tooltip.run();
 
           
           // should run above everything
