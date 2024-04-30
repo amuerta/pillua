@@ -15,16 +15,19 @@ import module_gui.DefaultBackground;
 import module_gui.PreviewWindow;
 import module_gui.ItemWindow;
 
+import module_data.Parser;
+import module_data.Database;
+
 // # Todo
 //
 // - git repo
 //
 // v state 
 // v exit window
-// o category arrows for navigating
-// - category search 
+// v category arrows for navigating
+// v category search 
 // v list (quick search, cart, bookmarks) search panel
-// - list hover tooltip element
+// v list ~hover~ PRESSED tooltip element
 // - settings elements
 // v contact panel
 // v about panel
@@ -216,6 +219,27 @@ public class App {
     AccountWindow account = new AccountWindow(content_narrow_g);
     ExitWindow exit = new ExitWindow(content_smallview_g,exit_trigger);
 
+
+
+    // DEBUG
+    Parser p = new Parser("./meta/app.cfg");
+    String str = p.pull_value("APPEARANCE","draw_shadows",null);
+
+    Parser ps = new Parser("./meta/db/pills");
+    String strs = ps.pull_value("ENTRY","name","1");
+    // String strs = ps.pull_object("ITEM",new String[] {"12","name"});
+    System.out.println("SEARCH : ["+ strs +"]");
+    Database db = new Database();
+       String s[] =  db.search("pills","Head");
+       System.out.println("SEARCH : ["+s[0] +","+ s[1] +"]");
+       String val = db.getvalue_from_item("pills","1","name");
+         // System.out.println("SEARCH : ["+s[0] +","+ s[1] +"]");
+
+
+
+    if (str != null)
+      System.out.println("\n value: " + val + "\n\n");
+
     while(!WindowShouldClose()) {
       BeginDrawing();
       ClearBackground(RAYWHITE);
@@ -223,9 +247,7 @@ public class App {
         //UPDATE BLOCK 
         {
 
-
           // greater windows / categories (may resize, take content space)
-
 
           if (!shouldclose_search) {
             shouldclose_search = search.run();

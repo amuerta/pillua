@@ -25,13 +25,11 @@ public class Dragable {
 
     Vector2 mouse = GetMousePosition();
 
-    if ( !IsMouseButtonDown(MOUSE_BUTTON_LEFT) )
+    if ( IsMouseButtonUp(MOUSE_BUTTON_LEFT) 
         pressed = false;
     
-    if ( pressed || 
-         (IsMouseButtonDown(MOUSE_BUTTON_LEFT) 
-         && CheckCollisionPointRec(mouse,bounding_box) ) )
-       
+    if ( IsMouseButtonDown(MOUSE_BUTTON_LEFT) 
+         && ( pressed || CheckCollisionPointRec(mouse,bounding_box))   )
     {
         pressed = true;
         Vector2 mouse_delta = GetMouseDelta();
@@ -39,10 +37,10 @@ public class Dragable {
           .x(geometry.x() + mouse_delta.x() )
           .y(geometry.y() + mouse_delta.y() );
 
-
         // recalculate window geometry
         calculate_geometry();
     }
 
+      mouse_held = false;
   }
 }

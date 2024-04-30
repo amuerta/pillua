@@ -1,0 +1,9 @@
+[
+  ENTRY(1,name,desc) {
+    name = "H8ad STV5";
+  }
+
+  ENTRY(2,name,desc) {
+    name = "MY HEAD";
+  }
+]
