@@ -71,15 +71,15 @@ public class PreviewWindow {
   }
 
 
-  public void run() 
+  public void run(boolean avil, String desc, String name, String icon_path) 
   {
     DrawRectangleRec(geometry,RAYWHITE); 
     GuiGroupBox(geometry, "Item info"); 
     {
       GuiGroupBox(icon, "*icon*");
-      GuiGroupBox(content, "*content*");
-      GuiStatusBar(status,"AVILABLE");
-      GuiLabel(info,"Text :0");
+      GuiGroupBox(content, name);
+      GuiStatusBar(status,(avil)? "Avilabale" : "Sold Out");
+      GuiLabel(info,"PRODUCT DESCRIPTION:"+"\n  "+desc);
 
     }
     calculate_geometry();

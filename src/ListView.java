@@ -4,8 +4,13 @@ import static com.raylib.Jaylib.RAYWHITE;
 import static com.raylib.Jaylib.VIOLET;
 import static com.raylib.Jaylib.GREEN;
 import static com.raylib.Raylib.*;
-import java.util.Arrays;
+
 import module_gui.PreviewWindow;
+
+import module_data.Database;
+
+import java.util.Arrays;
+import java.util.ArrayList;
 
 // TODO:
 //
@@ -34,16 +39,29 @@ public class ListView {
   public PreviewWindow tooltip;
   public Rectangle[] list_buttons = new Rectangle[NBUTTONS];
 
+  public ArrayList<String[]> items_buffer; 
+  public String             category_name; 
+
   public int[] hovered      = {-1};
   public int[] active       = {-1};
 
-  public ListView(Rectangle geometry,Rectangle tooltip_geometry, String search_bar_preview, String titlebar_string) {
+
+  public ItemWindow     subwindow ;
+  public boolean subwindow_active ;
+
+  public ListView(Rectangle geometry,Rectangle tooltip_geometry, String search_bar_preview, String titlebar_string, String category_name) {
     this.geometry = geometry;
     this.tooltip_geometry = tooltip_geometry;
     this.titlebar_string = titlebar_string;
-    this.items_concat = "one\ntwo\nthree\nfour\n";
+    this.items_concat = "one\ntwo\nthree\nfour";
 
     this.tooltip = new PreviewWindow(this.tooltip_geometry, false);
+
+    this.items_buffer = new ArrayList<String[]> ();
+    this.category_name = category_name;
+
+    this.subwindow = null;
+    this.subwindow_active = false;
 
     // build string for search and ghost text as search_placeholder
     for(int i = 0; i < MAX_STR_LEN; i++)
@@ -79,30 +97,76 @@ public class ListView {
 
   }
 
+  public void add_subwindow(ItemWindow win) {
+    this.subwindow = win;
+  } 
+
+  public String cstr_to_string() {
+    String buffer = "";
+    for (int i = 0;  MAX_STR_LEN < i || search_str[i] != '\0' ; i++ )
+        buffer += (char)search_str[i];
+    return buffer;
+  }
+
   public boolean run() {
+    
+    // rebuild string and item buffer
+    String sbar = cstr_to_string();
+    items_buffer.clear();
+    items_buffer = new Database().search(category_name,sbar);
+
+    // rebuild list appearance
+
+    final int DBID  = 0;
+    final int NAME  = 1;
+    final int DESC  = 2;
+    final int AVIL  = 3;
+    final int CATG  = 4;
+    final int PICT  = 5;
+
+    items_concat = "";
+    for (int i = 0; i < items_buffer.size(); i++) {
+      items_concat += items_buffer.get(i)[NAME];
+        if (i < items_buffer.size() - 1)
+          items_concat += "\n";
+    }
+
+
+
+    // WINDOW 
+    //
     boolean window_close_call = 
       GuiWindowBox(geometry,titlebar_string) == 1;
- 
  
     int byte_str_len = 0;
 
     for(int i = 0; i < MAX_STR_LEN && search_str[i] !='\0'; i++)
       byte_str_len++;
 
-    int s_state = GuiTextBox(
-        search_bar,
-        (!search_active && byte_str_len < 1) ? search_placeholder : search_str,
-        MAX_STR_LEN,
-        search_active //(byte_str_len >= MAX_STR_LEN - 1)? false : search_active
-    );
-      
-    if (s_state == 1 ) 
-      search_active = !search_active;
-    GuiListView(list,items_concat,hovered,active);
+    // IF WINDOW INACTIVE DRAW DUMMY BOX
+    if (subwindow_active) {
+      GuiDummyRec(search_bar,"");
+    } 
+    else {
+      int s_state = GuiTextBox(
+          search_bar,
+          (!search_active && byte_str_len < 1) ? search_placeholder : search_str,
+          MAX_STR_LEN,
+          search_active //(byte_str_len >= MAX_STR_LEN - 1)? false : search_active
+          );
+
+      if (s_state == 1 ) 
+        search_active = !search_active;
+    }
+
+    if (subwindow_active)
+      GuiDummyRec(list,"");
+    else
+      GuiListView(list,items_concat,hovered,active);
     
 
     // part that handles tooltip and right click
-    if (active[0] >= 0)
+    if (active[0] >= 0 && !subwindow_active)
     {
       int button_g = active[0];
 
@@ -110,7 +174,14 @@ public class ListView {
         .x(list_buttons[button_g].x() + 4*PADDING)
         .y(list_buttons[button_g].y() + 4*PADDING);
 
-      tooltip.run();
+      String[] item = items_buffer.get(active[0]);
+
+      tooltip.run(
+          item[AVIL].equals("true"), 
+          item[DESC],
+          item[NAME],
+          item[PICT]
+        );
 
       if (
           IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) 
@@ -120,9 +191,20 @@ public class ListView {
               list_buttons[button_g]
             ) 
         ) // TODO: 
-          // add actual call to page;
-        System.out.println("PRESSED RIGHT");
+          // [DONE] add actual call to page; 
+          //        make window elements mask when subwin shown
+      {
+        subwindow_active = !subwindow_active;
+        System.out.println("CALL SUBWINDOW");
+      }
     }
+
+
+
+    // SUBWINDOW 
+    //
+    if (subwindow != null && subwindow_active)
+      subwindow_active = !subwindow.run();
 
     return window_close_call;
   }

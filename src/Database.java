@@ -1,11 +1,14 @@
 package module_data;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+
+
 
 import module_data.Parser;
 
@@ -42,8 +45,9 @@ public class Database {
   }
 
 
-  public String[] search(String c, String name) {
+  public ArrayList<String[]> search(String c, String name) {
 
+    ArrayList<String[]> queary_result = new ArrayList<String[]>();
     String content = null;
     File f = new File(DB_LOCK);
     if (!f.exists())
@@ -68,13 +72,15 @@ public class Database {
         String item = items.nextToken();
         StringTokenizer fields = new StringTokenizer(item,",");
 
-        // ID, NAME, DESC, AVIL, CATG;
-        final int TOKENS_EXPECTED = 5;
+        // ID, NAME, DESC, AVIL,CATG,PIC_PATH ;
+        final int TOKENS_EXPECTED = 6;
+        final int TOKENS_TAIL     = 1;
 
 
-        if (fields.countTokens() != TOKENS_EXPECTED)
+        if (fields.countTokens() != TOKENS_EXPECTED )
         {
-          System.out.println("UNMATCHED ITEM COUNT");
+          if (fields.countTokens() != TOKENS_TAIL)
+            System.out.println("UNMATCHED ITEM COUNT: "+fields.countTokens());
           continue;
         }
 
@@ -82,11 +88,11 @@ public class Database {
         
         int i = 0; while(fields.hasMoreTokens())
         {
-          String item_field = fields.nextToken();
+          String item_field = fields.nextToken()
+            .replace("\\","\n"); // : breakline token
           item_metadata[i] = item_field;
             i++;
-
-          //                  DEBUG : System.out.println("\t\t FOUND FIELD: "+item_field);
+                           // DEBUG : System.out.println("\t\t FOUND FIELD: "+item_field.replace("\\","\n"));
         }
 
         final int CATEGORY = 4;
@@ -94,14 +100,16 @@ public class Database {
 
         if (c != null) {
           if (item_metadata[CATEGORY].contains(c) && item_metadata[NAME].contains(name))
-            return item_metadata;
+            queary_result.add(item_metadata);
+            //return item_metadata;
         }
         else if (item_metadata[NAME].contains(name))
-          return item_metadata;
+          queary_result.add(item_metadata);
+          // return item_metadata;
 
       }
     }
-    return null;
+    return queary_result;
   }
 
 

@@ -18,6 +18,8 @@ import module_gui.ItemWindow;
 import module_data.Parser;
 import module_data.Database;
 
+import java.util.ArrayList;
+
 // # Todo
 //
 // - git repo
@@ -194,19 +196,24 @@ public class App {
         content_view_window_g,
         tooltip_big_g,
         "#42# Search all products", 
-        "Search product in DATABASE"
+        "Search product in DATABASE",
+        null
       );
+    search.add_subwindow(product);
+
     ListView bookmarks = new ListView(
         content_view_window_g,
         tooltip_big_g,
         "#42# Search bookmarked", 
-        "Search product in BOOKMARKS"
+        "Search product in BOOKMARKS",
+        "BOOKMARKS"
       );
     ListView cart  = new ListView(
         content_view_window_g, 
         tooltip_big_g,
         "#42# Search in cart", 
-        "Search product in SHOPPING CART"
+        "Search product in SHOPPING CART",
+        "BOOKMARKS"
       );
 
 
@@ -227,18 +234,25 @@ public class App {
 
     Parser ps = new Parser("./meta/db/pills");
     String strs = ps.pull_value("ENTRY","name","1");
-    // String strs = ps.pull_object("ITEM",new String[] {"12","name"});
+
     System.out.println("SEARCH : ["+ strs +"]");
     Database db = new Database();
-       String s[] =  db.search("pills","Head");
-       System.out.println("SEARCH : ["+s[0] +","+ s[1] +"]");
-       String val = db.getvalue_from_item("pills","1","name");
-         // System.out.println("SEARCH : ["+s[0] +","+ s[1] +"]");
+    ArrayList<String[]> s =  db.search("MAIN","Head");
+    
+    for(int i = 0; i < s.size(); i++)
+    {
+      System.out.println("\nFOUND ENTRY ["+ i +"]: \n");
+      for(int j = 0; j < 6; j++)
+        System.out.println("\t >" + s.get(i)[j]);
+    }
+
+       // System.out.println("SEARCH : ["+s[0] +","+ s[1] +"]");
+       // String val = db.getvalue_from_item("pills","1","name");
 
 
 
-    if (str != null)
-      System.out.println("\n value: " + val + "\n\n");
+    // if (str != null)
+      // System.out.println("\n value: " + val + "\n\n");
 
     while(!WindowShouldClose()) {
       BeginDrawing();
@@ -287,7 +301,7 @@ public class App {
             shouldclose_contact = contact.run();
 
           // TEMP
-          product.run();
+          // product.run();
 
           // USER
 
