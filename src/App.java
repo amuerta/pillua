@@ -132,6 +132,13 @@ public class App {
 
     Rectangle navpan_g = new Rectangle().x(0).y(0).width(WIN_W).height(PANEL_HEIGHT);
 
+
+    Rectangle background_g = new Rectangle()
+      .y((WIN_H - PANEL_HEIGHT ) / 2)
+      .x( (WIN_W-250) / 2 )
+      .width(250)
+      .height(170);
+
     Rectangle content_view_g = new Rectangle()
       .y(PANEL_HEIGHT + avrg_padding)
       .x(avrg_padding)
@@ -180,6 +187,9 @@ public class App {
 
     // CREATE ELEMENTS
     
+    // background
+    DefaultBackground background = new DefaultBackground(background_g);
+
     // panel
     NavPanel navpan     = new NavPanel(navpan_g,page_selected);
     ItemWindow product = new ItemWindow(content_halfview_g);
@@ -260,6 +270,9 @@ public class App {
 
         //UPDATE BLOCK 
         {
+          // bg
+          background.run();
+
 
           // greater windows / categories (may resize, take content space)
 
