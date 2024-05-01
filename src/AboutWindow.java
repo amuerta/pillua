@@ -35,7 +35,7 @@ public class AboutWindow extends Dragable {
     calculate_geometry();
 
     // picture loading
-    this.framepic_image= LoadImageAnim("src/res/about.gif",gif_frames);
+    this.framepic_image= LoadImageAnim("./res/about.gif",gif_frames);
     ImageResize(this.framepic_image, (int)picture.width(), (int)picture.height());
     this.framepic_texture = LoadTextureFromImage(framepic_image);
   }
